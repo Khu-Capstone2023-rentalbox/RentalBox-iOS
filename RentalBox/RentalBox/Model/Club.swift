@@ -6,3 +6,11 @@
 //
 
 import Foundation
+
+struct Club: Codable {
+    let id: Int
+    let name: String
+    let created_at: Date
+    var updated_at: Date
+    var members: Int
+}
