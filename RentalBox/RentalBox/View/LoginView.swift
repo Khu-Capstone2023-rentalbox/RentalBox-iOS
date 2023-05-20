@@ -32,7 +32,7 @@ struct LoginView: View {
                 .background(in: RoundedRectangle(cornerRadius: 10))
                 .padding()
                 NavigationLink {
-                    LoginView()
+                    MainView()
                 } label: {
                     RoundedRectangle(cornerRadius: 10)
                         .foregroundColor(.white)
