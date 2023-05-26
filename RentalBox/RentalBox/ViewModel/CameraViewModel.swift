@@ -8,12 +8,19 @@
 import Foundation
 import AVFoundation
 import SwiftUI
+import Combine
 
 class CameraViewModel: ObservableObject {
     private let model: Camera
     private let session: AVCaptureSession
     let cameraPreview: AnyView
+    let hapticImpact = UIImpactFeedbackGenerator()
     
+    private var isCameraBusy = false
+    private var subscriptions = Set<AnyCancellable>()
+    
+    @Published var shutterEffect = false
+    @Published var recentImage: UIImage?
     @Published var isFlashOn = false
     @Published var isSilentModeOn = false
     
@@ -23,14 +30,30 @@ class CameraViewModel: ObservableObject {
     
     func switchFlash() {
         isFlashOn.toggle()
+        model.flashMode = isFlashOn == true ? .on : .off
     }
     
     func switchSilent() {
         isSilentModeOn.toggle()
+        model.isSilentModeOn = isSilentModeOn
     }
     
     func capturePhoto() {
-        print("[CameraViewModel]: Photo captured!")
+        if isCameraBusy == false {
+            hapticImpact.impactOccurred()
+                        withAnimation(.easeInOut(duration: 0.1)) {
+                            shutterEffect = true
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            withAnimation(.easeInOut(duration: 0.1)) {
+                                self.shutterEffect = false
+                            }
+                        }
+            model.capturePhoto()
+            print("[CameraViewModel]: Photo captured!")
+        } else {
+            print("[CameraViewModel]: Camera's busy.")
+        }
     }
     
     func changeCamera() {
@@ -41,5 +64,16 @@ class CameraViewModel: ObservableObject {
         model = Camera()
         session = model.session
         cameraPreview = AnyView(CameraPreviewView(session: session))
+        
+        model.$recentImage.sink { [weak self] (photo) in
+            guard let pic = photo else { return }
+            self?.recentImage = pic
+        }
+        .store(in: &self.subscriptions)
+        
+        model.$isCameraBusy.sink { [weak self] (result) in
+            self?.isCameraBusy = result
+        }
+        .store(in: &self.subscriptions)
     }
 }

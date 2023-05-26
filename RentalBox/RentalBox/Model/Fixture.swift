@@ -7,20 +7,20 @@
 
 import Foundation
 
-struct Fixture: Codable {
+struct Fixture: Codable,Identifiable {
+    let id: UUID?
     var isSuccess: Bool
     var message: String
     var code: Int
     var data: [Book]
     
     enum codingKeys: String, CodingKey {
-        case isSuccess, message, code
-        case data = "fixtures"
+        case isSuccess, message, code,data
     }
 }
 
-struct Book: Codable {
-    let id: Int
+struct Book: Codable, Hashable {
+    let bookId: Int
     let name: String
     let created_at: Date?
     let updated_at: Date?

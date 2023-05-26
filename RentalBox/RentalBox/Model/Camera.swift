@@ -13,7 +13,11 @@ class Camera: NSObject, ObservableObject {
     var videoDeviceInput: AVCaptureDeviceInput!
     let output = AVCapturePhotoOutput()
     var photoData = Data(count: 0)
+    var isSilentModeOn = false
+    var flashMode: AVCaptureDevice.FlashMode = .off
     
+    @Published var isCameraBusy = false
+    @Published var recentImage: UIImage?
     // 카메라 셋업 과정을 담당하는 함수, positio
     func setUpCamera() {
         if let device = AVCaptureDevice.default(.builtInWideAngleCamera,
@@ -61,6 +65,7 @@ class Camera: NSObject, ObservableObject {
     func capturePhoto() {
         // 사진 옵션 세팅
         let photoSettings = AVCapturePhotoSettings()
+        photoSettings.flashMode = self.flashMode
         
         self.output.capturePhoto(with: photoSettings, delegate: self)
         print("[Camera]: Photo's taken")
@@ -76,18 +81,29 @@ class Camera: NSObject, ObservableObject {
 
 extension Camera: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, willBeginCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+        self.isCameraBusy = true
     }
     
     func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+        if isSilentModeOn {
+            print("[Camera]: Silent sound activated")
+            AudioServicesDisposeSystemSoundID(1108)
+        }
     }
     
     func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+        if isSilentModeOn {
+            AudioServicesDisposeSystemSoundID(1108)
+        }
     }
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         guard let imageData = photo.fileDataRepresentation() else { return }
+        self.recentImage = UIImage(data: imageData)
         self.savePhoto(imageData)
         
         print("[CameraModel]: Capture routine's done")
+        
+        self.isCameraBusy = false
     }
 }

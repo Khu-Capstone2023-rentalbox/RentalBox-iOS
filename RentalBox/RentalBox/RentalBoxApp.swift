@@ -9,12 +9,10 @@ import SwiftUI
 
 @main
 struct RentalBoxApp: App {
-    let persistenceController = PersistenceController.shared
-
     var body: some Scene {
         WindowGroup {
-            OnboardingView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            ContentView().environmentObject(UserVM())
+                .environmentObject(FixtureViewModel())
         }
     }
 }

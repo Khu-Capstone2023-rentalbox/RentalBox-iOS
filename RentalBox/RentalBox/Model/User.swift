@@ -7,6 +7,19 @@
 
 import Foundation
 
+struct LoginResopnse: Codable {
+    let message: String?
+    let code: Int?
+    let isSuccess: Bool?
+    let clubName: String?
+    let data: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case message, code, isSuccess, clubName
+        case data = "token"
+    }
+}
+
 struct User: Codable {
     let id: Int
     let name: String
