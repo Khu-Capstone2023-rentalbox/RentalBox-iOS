@@ -15,18 +15,18 @@ struct CameraView: View {
             VStack {
                 HStack {
                     // 셔터사운드 온오프
-                    Button(action: {viewModel.switchFlash()}) {
-                        Image(systemName: viewModel.isFlashOn ?
+                    Button(action: {viewModel.switchSilent()}) {
+                        Image(systemName: viewModel.isSilentModeOn ?
                               "speaker.fill" : "speaker")
-                        .foregroundColor(viewModel.isFlashOn ? .yellow : .white)
+                        .foregroundColor(viewModel.isSilentModeOn ? .yellow : .white)
                     }
                     .padding(.horizontal, 30)
                     
                     // 플래시 온오프
-                    Button(action: {viewModel.switchSilent()}) {
-                        Image(systemName: viewModel.isSilentModeOn ?
+                    Button(action: {viewModel.switchFlash()}) {
+                        Image(systemName: viewModel.isFlashOn ?
                               "bolt.fill" : "bolt")
-                        .foregroundColor(viewModel.isSilentModeOn ? .yellow : .white)
+                        .foregroundColor(viewModel.isFlashOn ? .yellow : .white)
                     }
                     .padding(.horizontal, 30)
                 }
@@ -36,13 +36,22 @@ struct CameraView: View {
                 Spacer()
                 
                 HStack{
-                    // 찍은 사진 미리보기, 일단 액션 X
                     Button(action: {}) {
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(lineWidth: 5)
-                            .frame(width: 75, height: 75)
-                            .padding()
+                        if let previewImage = viewModel.recentImage {
+                            Image(uiImage: previewImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 75, height: 75)
+                                .clipShape(RoundedRectangle(cornerRadius: 15))
+                                .aspectRatio(1, contentMode: .fit)
+                        } else {
+                            RoundedRectangle(cornerRadius: 15)
+                                .stroke(lineWidth: 3)
+                                .foregroundColor(.white)
+                                .frame(width: 75, height: 75)
+                        }
                     }
+                    .padding()
                     
                     Spacer()
                     
@@ -70,6 +79,7 @@ struct CameraView: View {
             }
             .foregroundColor(.white)
         }
+        .opacity(viewModel.shutterEffect ? 0 : 1)
         .onAppear(
             perform: self.viewModel.configure
         )

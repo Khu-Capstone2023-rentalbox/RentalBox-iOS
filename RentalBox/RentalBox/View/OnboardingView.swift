@@ -17,6 +17,7 @@ var formatter: NumberFormatter = {
 struct OnboardingView: View {
     let screenWidth = UIScreen.main.bounds.width
     
+    @EnvironmentObject var userModel: UserVM
     @State var enteringCode: Int?
     var body: some View {
         NavigationView {
@@ -34,6 +35,9 @@ struct OnboardingView: View {
                             .font(.system(size: 17, weight: .bold, design: .rounded))
                             .padding()
                         TextField("참여 코드를 입력해주세요.", value: $enteringCode, formatter: formatter)
+                            .onSubmit {
+                                userModel.clubID = enteringCode ?? 0
+                            }
                     }
                     .background(in: RoundedRectangle(cornerRadius: 10))
                     .padding()

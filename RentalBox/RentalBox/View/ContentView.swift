@@ -9,80 +9,64 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
-        animation: .default)
-    private var items: FetchedResults<Item>
-
+    let screenWidth = UIScreen.main.bounds.width
+    
+    @EnvironmentObject var userModel: UserVM
+    @EnvironmentObject var networking: FixtureViewModel
+    @State var enteringCode: Int?
     var body: some View {
         NavigationView {
-            List {
-                ForEach(items) { item in
+            ZStack {
+                Color.gray.opacity(0.4)
+                    .ignoresSafeArea()
+                VStack {
+                    Text("RentalBox")
+                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                    Text("동아리 비품 관리를 손 쉽게!")
+                        .font(.system(size: 10, weight: .light))
+                    Spacer()
+                    HStack {
+                        Text("참여코드:")
+                            .font(.system(size: 17, weight: .bold, design: .rounded))
+                            .padding()
+                        TextField("참여 코드를 입력해주세요.", value: $userModel.clubID, formatter: formatter)
+                    }
+                    .background(in: RoundedRectangle(cornerRadius: 10))
+                    .padding()
                     NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
+                        LoginView()
                     } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
+                        RoundedRectangle(cornerRadius: 10)
+                            .foregroundColor(.white)
+                            .overlay (
+                                Text("입력완료")
+                            )
+                            .frame(width: screenWidth / 2, height: 50)
                     }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                    Text("또는")
+                        .font(.system(size: 13, weight: .light, design: .default))
+                    NavigationLink {
+                        ClubRegisterView()
+                    } label: {
+                        RoundedRectangle(cornerRadius: 10)
+                            .foregroundColor(.white)
+                            .overlay (
+                                Text("동아리 생성하기")
+                            )
+                            .frame(width: screenWidth / 2, height: 50)
                     }
+                    //TODO: 값 입력 안 했을 경우, 백엔드에서 값 불러와서 맞춰보는 거 처리해야함
+
+                    Text("동아리를 직접 생성해보세요.")
+                        .font(.system(size: 13, weight: .light, design: .default))
+                    Spacer()
                 }
-            }
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
         }
     }
 }
-
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
-
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        ContentView().environmentObject(UserVM())
     }
 }

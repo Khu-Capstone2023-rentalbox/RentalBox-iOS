@@ -13,6 +13,7 @@ struct MyPageView: View {
     
     
     var body: some View {
+        NavigationView{
         ZStack {
             Color.gray
                 .opacity(0.4)
@@ -25,7 +26,7 @@ struct MyPageView: View {
                         .padding(.horizontal)
                     Spacer()
                 }
-                MainListView()
+                MainListView(isMypage: true)
                 Button {
                     logout = true
                 } label: {
@@ -36,7 +37,7 @@ struct MyPageView: View {
                             Text("로그아웃")
                         )
                 }
-
+            }
             }
         }
     }

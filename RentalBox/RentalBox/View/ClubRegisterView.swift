@@ -7,6 +7,9 @@
 
 import SwiftUI
 import UIKit
+import FilePicker
+import Alamofire
+import UniformTypeIdentifiers
 
 var stringFormatter: PersonNameComponentsFormatter = {
     let formatter = PersonNameComponentsFormatter()
@@ -25,9 +28,13 @@ struct ListViewModifier: ViewModifier {
 var arrayDict = ["2019102168", "2019102169", "2019102170", "2019102171", "2019102172", "2019102173", "2019102173", "2019102173", "2019102173", "2019102173", "2019102173", "2019102173", "2019102173", "2019102173"]
 
 struct ClubRegisterView: View {
-    @State var clubName: String?
+    @State var clubName: String = "D.com"
+    @State var openFile = false
+    
     let screenWidth = UIScreen.main.bounds.width
     let screenHeight = UIScreen.main.bounds.height
+    
+    @ObservedObject var networkingClub = ClubViewModel()
     
     var body: some View {
         ZStack {
@@ -38,7 +45,7 @@ struct ClubRegisterView: View {
                     Text("동아리 명:")
                         .font(.system(size: 17, weight: .bold, design: .rounded))
                         .padding()
-                    TextField("동아리 명을 입력해주세요.", value: $clubName, formatter: stringFormatter)
+                    TextField("", text: $clubName)
                 }
                 .background(in: RoundedRectangle(cornerRadius: 10))
                 .padding()
@@ -50,6 +57,22 @@ struct ClubRegisterView: View {
                 .listStyle(.insetGrouped)
                 .frame(height: screenHeight / 2)
                 .modifier(ListViewModifier())
+                Button {
+                    openFile.toggle()
+                } label: {
+                    Text("Document Picker")
+                }.fileImporter(isPresented: $openFile, allowedContentTypes: [UTType.init(mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")!]) { result in
+                    do {
+                        let fileURL = try result.get()
+                        let url = try fileURL.asURL()
+                        print(fileURL)
+                        networkingClub.uploadFile(fileURL: url, clubName: clubName)
+                        
+                    } catch {
+                        
+                    }
+                }
+                
                 NavigationLink {
                     MainView()
                 } label: {
@@ -63,6 +86,7 @@ struct ClubRegisterView: View {
             }
         }
     }
+    
 }
 
 struct ClubRegisterView_Previews: PreviewProvider {

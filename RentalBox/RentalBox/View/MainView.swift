@@ -8,13 +8,15 @@
 import SwiftUI
 import UIKit
 struct MainView: View {
-    let clubName = "D.Com"
     let screenWidth = UIScreen.main.bounds.width
     let screenHeight = UIScreen.main.bounds.height
     
     @State private var register = false
     @State private var rent = false
     
+    @EnvironmentObject var networking: FixtureViewModel
+    @EnvironmentObject var userVM: UserVM
+   
     var body: some View {
         ZStack {
             Color.gray
@@ -33,7 +35,7 @@ struct MainView: View {
                     SearchBarView()
                 }
                 .padding(.horizontal)
-                MainListView()
+                MainListView(dummyList: networking.fixtures?.data ?? [Book(bookId: 0, name: "인가탐", created_at: Date.now, updated_at: Date.now)])
                     .padding()
                 Spacer()
                 HStack {

@@ -10,7 +10,7 @@ import SwiftUI
 struct Dummy: Hashable {
     var name: String
     var category: categories
-    
+    var count: Int?
     enum categories: String, CaseIterable {
         case book = "책"
         case boardGame = "보드게임"
@@ -20,18 +20,28 @@ struct Dummy: Hashable {
 }
 
 struct MainListView: View {
-    @State var dummyList: [Dummy] = [Dummy(name: "인간의 가치 탐색", category: .book), Dummy.init(name: "물리학 및 실험", category: .book), Dummy.init(name: "아발론", category: .boardGame)]
-    
+    @State var dummyList: [Book] = [Book(bookId: 0, name: "인가탐", created_at: Date.now, updated_at: Date.now)]
+    var isMypage = false
     var body: some View {
-        VStack{
+        VStack {
             List(dummyList, id:\.self) { row in
                 HStack {
-                    Text(row.name)
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                    if isMypage {
+                        NavigationLink(destination: FixtureRentView(fixture: row)){
+                            Text(row.name)
+                                .font(.system(size: 15, weight: .bold, design: .rounded))
+                            Text(String(row.bookId))
+                                .font(.system(size: 10, weight: .light, design: .rounded))
+                        }
+                    } else {
+                        NavigationLink(destination: FixtureDetailView(fixture: row)){
+                            Text(row.name)
+                                .font(.system(size: 15, weight: .bold, design: .rounded))
+                            Text(String(row.bookId))
+                                .font(.system(size: 10, weight: .light, design: .rounded))
+                        }
+                    }
                     Spacer()
-                    Text(row.category.rawValue)
-                        .font(.system(size: 10, weight: .light, design: .rounded))
-                    
                 }
             }
             .scrollContentBackground(.hidden)

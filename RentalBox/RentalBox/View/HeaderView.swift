@@ -9,14 +9,15 @@ import SwiftUI
 import UIKit
 
 struct HeaderView: View {
-    let clubName = "D.Com"
+    
     var isMain = false
     let screenWidth = UIScreen.main.bounds.width
     
     @State private var moveToMy = false
+    @EnvironmentObject var userVM: UserVM
     var body: some View {
         HStack {
-            Text(clubName)
+            Text(UserDefaultsManager.shared.getClubName())
                 .font(.system(size: 30, weight: .bold, design: .rounded))
                 .padding()
                 .frame(width: screenWidth / 3)
