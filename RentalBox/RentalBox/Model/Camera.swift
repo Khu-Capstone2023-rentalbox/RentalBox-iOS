@@ -7,6 +7,7 @@
 import Foundation
 import AVFoundation
 import UIKit
+import Alamofire
 
 class Camera: NSObject, ObservableObject {
     var session = AVCaptureSession()
@@ -14,10 +15,16 @@ class Camera: NSObject, ObservableObject {
     let output = AVCapturePhotoOutput()
     var photoData = Data(count: 0)
     var isSilentModeOn = false
+    var isReturn:Bool
     var flashMode: AVCaptureDevice.FlashMode = .off
     
     @Published var isCameraBusy = false
     @Published var recentImage: UIImage?
+    @Published var uploadResponse: Rent?
+    
+    init(isReturn: Bool) {
+        self.isReturn = isReturn
+    }
     // 카메라 셋업 과정을 담당하는 함수, positio
     func setUpCamera() {
         if let device = AVCaptureDevice.default(.builtInWideAngleCamera,
@@ -77,6 +84,41 @@ class Camera: NSObject, ObservableObject {
         // 사진 저장하기
         print("[Camera]: Photo's saved")
     }
+    func uploadPhoto(imageData: Data) {
+        let url = URL(string: "http://www.rentalbox.store/items/rent")
+        print("rent Photo", url)
+        let token = UserDefaultsManager.shared.getTokens()
+        AF.upload(multipartFormData: { MultipartFormData in
+            MultipartFormData.append(imageData, withName: "picture", fileName: "picture", mimeType: "image/jpeg")
+        },to: url!, method: .post, headers: [ "x-access-token": token.accessToken, "Content-Type": "multipart/form-data"])
+        .responseDecodable(of: Rent.self, completionHandler: { response in
+            switch response.result {
+            case .success(let response):
+                self.uploadResponse = response
+            case .failure(let error):
+                print(error.responseCode)
+                print(error)
+            }
+        })
+    }
+    
+    func returnPhoto(imageData: Data){
+        let url = URL(string: "http://www.rentalbox.store/items/return")
+        print("return Photo", url)
+        let token = UserDefaultsManager.shared.getTokens()
+        AF.upload(multipartFormData: { MultipartFormData in
+            MultipartFormData.append(imageData, withName: "picture", fileName: "picture", mimeType: "image/jpeg")
+        },to: url!, method: .post, headers: [ "x-access-token": token.accessToken, "Content-Type": "multipart/form-data"])
+        .response { response in
+            switch response.result {
+            case .success(let data):
+                print(data)
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
 }
 
 extension Camera: AVCapturePhotoCaptureDelegate {
@@ -100,6 +142,13 @@ extension Camera: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         guard let imageData = photo.fileDataRepresentation() else { return }
         self.recentImage = UIImage(data: imageData)
+        if(isReturn) {
+            print("returnPhoto")
+            self.returnPhoto(imageData: imageData)
+        } else {
+            print("uploadPhoto")
+            self.uploadPhoto(imageData: imageData)
+        }
         self.savePhoto(imageData)
         
         print("[CameraModel]: Capture routine's done")

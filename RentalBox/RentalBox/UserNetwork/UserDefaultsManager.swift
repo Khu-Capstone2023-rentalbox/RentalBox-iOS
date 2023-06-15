@@ -43,6 +43,7 @@ class UserDefaultsManager {
         let accessToken = UserDefaults.standard.string(forKey: Key.accessToken.rawValue) ?? ""
         return TokenData(accessToken: accessToken)
     }
+    
     func getClubName()->String {
         let clubName = UserDefaults.standard.string(forKey: Constants.clubName.rawValue) ?? ""
         return clubName

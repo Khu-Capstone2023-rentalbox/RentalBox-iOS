@@ -12,7 +12,7 @@ struct RentalBoxApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView().environmentObject(UserVM())
-                .environmentObject(FixtureViewModel())
+//                .environmentObject(FixtureViewModel())
         }
     }
 }
