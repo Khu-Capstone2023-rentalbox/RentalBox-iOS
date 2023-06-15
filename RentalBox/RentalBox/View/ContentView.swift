@@ -12,8 +12,9 @@ struct ContentView: View {
     let screenWidth = UIScreen.main.bounds.width
     
     @EnvironmentObject var userModel: UserVM
-    @EnvironmentObject var networking: FixtureViewModel
+    @StateObject var networking = FixtureViewModel()
     @State var enteringCode: Int?
+    @FocusState private var isFocused: Bool
     var body: some View {
         NavigationView {
             ZStack {
@@ -29,12 +30,14 @@ struct ContentView: View {
                         Text("참여코드:")
                             .font(.system(size: 17, weight: .bold, design: .rounded))
                             .padding()
-                        TextField("참여 코드를 입력해주세요.", value: $userModel.clubID, formatter: formatter)
+                        TextField("참여 코드를 입력해주세요.", value: $userModel.clubID, formatter: numberFormatter)
+                            .focused($isFocused)
+                            .keyboardType(.numberPad)
                     }
                     .background(in: RoundedRectangle(cornerRadius: 10))
                     .padding()
                     NavigationLink {
-                        LoginView()
+                        LoginView(networking: networking)
                     } label: {
                         RoundedRectangle(cornerRadius: 10)
                             .foregroundColor(.white)
@@ -62,11 +65,14 @@ struct ContentView: View {
                     Spacer()
                 }
             }
-        }
+            .onTapGesture {
+                isFocused = false
+            }
+        }.navigationViewStyle(.stack)
     }
 }
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView().environmentObject(UserVM())
-    }
-}
+//struct ContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ContentView().environmentObject(UserVM())
+//    }
+//}

@@ -21,36 +21,68 @@ struct Dummy: Hashable {
 
 struct MainListView: View {
     @State var dummyList: [Book] = [Book(bookId: 0, name: "인가탐", created_at: Date.now, updated_at: Date.now)]
+    @State var rental: [Rental]?
+    @State var fixtureDetail = FixtureDetail(isSuccess: false, message: "", code: 1)
+    @State var book: Book = Book(name: "인가탐")
+    @State var moveToList = false
+    @Binding var inputText: String
+    
+    @ObservedObject var networking: FixtureViewModel
     var isMypage = false
+    let url = "http://www.rentalbox.store"
     var body: some View {
         VStack {
-            List(dummyList, id:\.self) { row in
+            List(dummyList.filter({ book in
+                filterSearchText(book)
+            }), id:\.self) { row in
                 HStack {
-                    if isMypage {
-                        NavigationLink(destination: FixtureRentView(fixture: row)){
-                            Text(row.name)
-                                .font(.system(size: 15, weight: .bold, design: .rounded))
-                            Text(String(row.bookId))
-                                .font(.system(size: 10, weight: .light, design: .rounded))
-                        }
-                    } else {
-                        NavigationLink(destination: FixtureDetailView(fixture: row)){
-                            Text(row.name)
-                                .font(.system(size: 15, weight: .bold, design: .rounded))
-                            Text(String(row.bookId))
-                                .font(.system(size: 10, weight: .light, design: .rounded))
+                    Text(row.name)
+                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                    Spacer()
+                    Image(systemName: "arrow.forward")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 10)
+                }
+                .contentShape(RoundedRectangle(cornerRadius: 10))
+                .onTapGesture {
+                    book = row
+                    Task {
+                        do {
+                            self.fixtureDetail = try await networking.alamofireFixtureDetail(url: url.appending("/items"), itemId: row.bookId ?? 23)
+                            
+                            book = fixtureDetail.data ?? Book(name: "")
+                            moveToList = true
+                            print("no error")
+                        } catch {
+                            print(error)
+                            moveToList = true
+                            print("error")
                         }
                     }
-                    Spacer()
                 }
+            }.scrollContentBackground(.hidden)
+                .refreshable {
+                    networking.alamofireNetworking(url: url)
+                    dummyList = networking.fixtures?.data ?? []
+                }
+            
+            NavigationLink(destination: FixtureDetailView(fixture: book, networking: networking), isActive: $moveToList) {
+                Text("")
             }
-            .scrollContentBackground(.hidden)
         }
     }
-}
-
-struct MainListView_Previews: PreviewProvider {
-    static var previews: some View {
-        MainListView()
+        private func filterSearchText(_ book: Book) -> Bool {
+            if inputText == "" || book.name.localizedCaseInsensitiveContains(inputText) {
+                return true
+            } else {
+                return false
+            }
+        }
     }
-}
+    
+    //struct MainListView_Previews: PreviewProvider {
+    //    static var previews: some View {
+    //        MainListView().environmentObject(FixtureViewModel())
+    //    }
+    //}

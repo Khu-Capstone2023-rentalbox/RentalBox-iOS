@@ -8,7 +8,13 @@
 import SwiftUI
 
 struct CameraView: View {
-    @ObservedObject var viewModel = CameraViewModel()
+    @ObservedObject var viewModel = CameraViewModel(isReturn: false)
+    var isReturn: Bool
+    init(isReturn: Bool) {
+        self.isReturn = isReturn
+        self.viewModel.isReturn = isReturn
+        print("set Return", isReturn)
+    }
     var body: some View {
         ZStack {
             viewModel.cameraPreview.ignoresSafeArea()
@@ -56,7 +62,9 @@ struct CameraView: View {
                     Spacer()
                     
                     // 사진찍기 버튼
-                    Button(action: {viewModel.capturePhoto()}) {
+                    Button(action: {
+                        viewModel
+                        viewModel.capturePhoto()}) {
                         Circle()
                             .stroke(lineWidth: 5)
                             .frame(width: 75, height: 75)
@@ -86,8 +94,8 @@ struct CameraView: View {
     }
 }
 
-struct CameraView_Previews: PreviewProvider {
-    static var previews: some View {
-        CameraView()
-    }
-}
+//struct CameraView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        CameraView()
+//    }
+//}

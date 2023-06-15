@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct MyPageView: View {
-    @State private var userName = "박재윤"
     @State private var logout = false
-    
-    
+    @State var inputText: String = ""
+    @EnvironmentObject var networking: FixtureViewModel
+    let url = "http://www.rentalbox.store/items/my-Item-list"
     var body: some View {
         NavigationView{
         ZStack {
@@ -21,14 +21,15 @@ struct MyPageView: View {
             VStack {
                 HeaderView(isMain: false)
                 HStack {
-                    Text("\(userName)님의 대여리스트")
+                    Text("\(networking.mypageData?.userName ?? "박재윤")님의 대여리스트")
                         .font(.system(size: 20, weight: .medium, design: .rounded))
                         .padding(.horizontal)
                     Spacer()
                 }
-                MainListView(isMypage: true)
+                MypageListView(networking: networking)
                 Button {
-                    logout = true
+                    UserDefaultsManager.shared.clearAll()
+                    NavigationUtill.popToRootView()
                 } label: {
                     RoundedRectangle(cornerRadius: 10)
                         .frame(width: 150, height: 50)
@@ -39,6 +40,8 @@ struct MyPageView: View {
                 }
             }
             }
+        }.onAppear {
+            networking.alamofireGetMypageList(url: url)
         }
     }
 }

@@ -10,11 +10,13 @@ import UIKit
 struct MainView: View {
     let screenWidth = UIScreen.main.bounds.width
     let screenHeight = UIScreen.main.bounds.height
+    let url = "http://www.rentalbox.store"
     
     @State private var register = false
     @State private var rent = false
-    
-    @EnvironmentObject var networking: FixtureViewModel
+    @State var inputText = ""
+    @State var fixtures = Fixtures(isSuccess: false, message: "", code: 0, data: [])
+    @ObservedObject var networking: FixtureViewModel
     @EnvironmentObject var userVM: UserVM
    
     var body: some View {
@@ -25,6 +27,7 @@ struct MainView: View {
             VStack {
                 HeaderView(isMain: true)
                     .frame(height:screenHeight / 10)
+                    .environmentObject(networking)
                 HStack {
                     Text("물품 리스트")
                         .font(.system(size: 25, weight: .bold, design: .rounded))
@@ -32,11 +35,16 @@ struct MainView: View {
                 }
                 .padding()
                 HStack {
-                    SearchBarView()
+                    SearchBarView(inputText: $inputText)
+                        .environmentObject(networking)
                 }
                 .padding(.horizontal)
-                MainListView(dummyList: networking.fixtures?.data ?? [Book(bookId: 0, name: "인가탐", created_at: Date.now, updated_at: Date.now)])
+                MainListView(dummyList: networking.fixtures?.data ?? [Book(bookId: 0, name: "인가탐", created_at: Date.now, updated_at: Date.now)], inputText: $inputText, networking: networking)
+                    .background(.clear)
                     .padding()
+                    .refreshable {
+                        await networking.alamofireNetworking(url: url)
+                    }
                 Spacer()
                 HStack {
                     Button {
@@ -50,7 +58,7 @@ struct MainView: View {
                             )
                     }
                     .sheet(isPresented: $register) {
-                        RegisterView()
+                        FixtureRegisterView().environmentObject(networking)
                     }
                     Spacer()
                         .frame(width: screenWidth / 10)
@@ -70,12 +78,12 @@ struct MainView: View {
                 }
                 .padding()
             }
-        }
+        }.navigationBarHidden(true)
     }
 }
 
-struct MainView_Previews: PreviewProvider {
-    static var previews: some View {
-        MainView()
-    }
-}
+//struct MainView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        MainView()
+//    }
+//}

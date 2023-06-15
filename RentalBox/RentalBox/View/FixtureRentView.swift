@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FixtureRentView: View {
-    var fixture: Book = Book(bookId: 1, name: "인가탐", created_at: Date.now, updated_at: Date.now)
+    @State var mypageList: MypageList
     var dummyList = ["박재윤": Date.now, "민병수": Date.now, "최용욱": Date.now]
     var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
@@ -20,30 +20,37 @@ struct FixtureRentView: View {
     }
     
     let screenWidth = UIScreen.main.bounds.width
+    let url = "http://www.rentalbox.store/items"
+    @EnvironmentObject var networking: FixtureViewModel
     var body: some View {
         ZStack {
             Color.gray.opacity(0.4)
                 .ignoresSafeArea()
             VStack {
                 HeaderView(isMain: false)
-                Text("\(fixture.name)")
+                Text("\(mypageList.itemName)")
                     .font(.system(size: 30, weight: .medium, design: .rounded))
                     .padding()
                 Text("책")
                     .font(.system(size: 18, weight: .light, design: .rounded))
                     .padding()
-                Text("대여일: ")
-                    .font(.system(size: 24, weight: .semibold, design: .rounded))
-                    .frame(width: screenWidth - 40, alignment: .leading)
-                Text("반납 예정일: ")
-                    .font(.system(size: 24, weight: .semibold, design: .rounded))
-                    .frame(width: screenWidth - 40, alignment: .leading)
-                    .padding(.top)
-                Text("연체일: ")
-                    .font(.system(size: 24, weight: .semibold, design: .rounded))
-                    .frame(width: screenWidth - 40, alignment: .leading)
-                    .padding(.top)
-                NavigationLink(destination: CameraView()) {
+                Section {
+                    ForEach(networking.mypageRentFixture?.data ?? [], id:\.self) { row in
+                        Text("대여일: \(row.rentalDate)")
+                            .font(.system(size: 24, weight: .semibold, design: .rounded))
+                            .frame(width: screenWidth - 40, alignment: .leading)
+                        Text("연체일: \(row.overDueDate)" )
+                            .font(.system(size: 24, weight: .semibold, design: .rounded))
+                            .frame(width: screenWidth - 40, alignment: .leading)
+                            .padding(.top)
+                        Text("연체료: \(row.charge)" )
+                            .font(.system(size: 24, weight: .semibold, design: .rounded))
+                            .frame(width: screenWidth - 40, alignment: .leading)
+                            .padding(.top)
+                    }
+                    
+                }
+                NavigationLink(destination: CameraView(isReturn: true)) {
                     RoundedRectangle(cornerRadius: 10)
                         .foregroundColor(.white)
                         .overlay(
@@ -55,11 +62,14 @@ struct FixtureRentView: View {
                 Spacer()
             }
         }
+        .onAppear {
+            networking.getMypageRentFixtureDetail(url: url, itemId: mypageList.itemId)
+        }
     }
 }
 
-struct FixtureView_Previews: PreviewProvider {
-    static var previews: some View {
-        FixtureRentView()
-    }
-}
+//struct FixtureView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        FixtureRentView()
+//    }
+//}

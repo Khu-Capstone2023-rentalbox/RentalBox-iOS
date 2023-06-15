@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SearchBarView: View {
-    @State var inputText = ""
+    @Binding var inputText: String
     var body: some View {
         VStack {
             TextField("검색어를 입력해주세요.", text: $inputText)
@@ -20,8 +20,8 @@ struct SearchBarView: View {
     }
 }
 
-struct SearchBarView_Previews: PreviewProvider {
-    static var previews: some View {
-        SearchBarView()
-    }
-}
+//struct SearchBarView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        SearchBarView()
+//    }
+//}
