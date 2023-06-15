@@ -9,6 +9,7 @@ import Foundation
 import AVFoundation
 import SwiftUI
 import Combine
+import Alamofire
 
 class CameraViewModel: ObservableObject {
     private let model: Camera
@@ -23,9 +24,10 @@ class CameraViewModel: ObservableObject {
     @Published var recentImage: UIImage?
     @Published var isFlashOn = false
     @Published var isSilentModeOn = false
-    
+    @Published var isReturn: Bool?
     func configure() {
         model.requestAndCheckPermissions()
+        model.isReturn = self.isReturn ?? false
     }
     
     func switchFlash() {
@@ -50,6 +52,7 @@ class CameraViewModel: ObservableObject {
                             }
                         }
             model.capturePhoto()
+            
             print("[CameraViewModel]: Photo captured!")
         } else {
             print("[CameraViewModel]: Camera's busy.")
@@ -60,8 +63,9 @@ class CameraViewModel: ObservableObject {
         print("[CameraViewModel]: Camera changed!")
     }
     
-    init() {
-        model = Camera()
+    init(isReturn: Bool) {
+        self.isReturn = isReturn
+        model = Camera(isReturn: isReturn)
         session = model.session
         cameraPreview = AnyView(CameraPreviewView(session: session))
         
