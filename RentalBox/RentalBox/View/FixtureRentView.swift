@@ -55,6 +55,7 @@ struct FixtureRentView: View {
                         .foregroundColor(.white)
                         .overlay(
                             Text("반납하기")
+                                .foregroundColor(.green.opacity(0.8))
                         )
                 }
                 .frame(width: 100, height: 40)

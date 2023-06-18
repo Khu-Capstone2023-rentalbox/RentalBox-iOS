@@ -31,7 +31,7 @@ struct ClubRegisterView: View {
     @State var clubName: String = ""
     @State var openFile = false
     @State var uploadComplete = false
-    
+    @FocusState var isFocused: Bool
     let screenWidth = UIScreen.main.bounds.width
     let screenHeight = UIScreen.main.bounds.height
     
@@ -41,12 +41,13 @@ struct ClubRegisterView: View {
         ZStack {
             Color.gray.opacity(0.4)
                 .ignoresSafeArea()
-            VStack {
+            ScrollView {
                 HStack {
                     Text("동아리 명:")
                         .font(.system(size: 17, weight: .bold, design: .rounded))
                         .padding()
                     TextField("동아리 명을 입력해주세요.", text: $clubName)
+                        .focused($isFocused)
                 }
                 .background(in: RoundedRectangle(cornerRadius: 10))
                 .padding()
@@ -59,10 +60,12 @@ struct ClubRegisterView: View {
                     } label: {
                         HStack {
                             Text("엑셀 파일을 선택해주세요.")
+                                .foregroundColor(.green.opacity(0.8))
+                                .fontWeight(.semibold)
                             Image(systemName: "square.and.arrow.up.fill")
                                 .resizable()
-                                .frame(width: 40, height: 40)
-                                .foregroundColor(Color.green.opacity(0.6))
+                                .frame(width: 20, height: 20)
+                                .foregroundColor(Color.green.opacity(0.8))
                         }
                             
                     }.fileImporter(isPresented: $openFile, allowedContentTypes: [UTType.init(mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")!]) { result in
@@ -93,10 +96,13 @@ struct ClubRegisterView: View {
                         .foregroundColor(.white)
                         .overlay (
                             Text("동아리 등록")
+                                .foregroundColor(!uploadComplete ? .gray : .green.opacity(0.8))
                         )
                         .frame(width: screenWidth / 2, height: 50)
-                }
+                }.disabled(!uploadComplete)
             }
+        }.onTapGesture {
+            isFocused = false
         }
     }
     

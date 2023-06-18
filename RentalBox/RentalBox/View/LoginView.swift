@@ -48,6 +48,7 @@ struct LoginView: View {
                         submitComplete = true
                     } label: {
                         Text("완료")
+                            .foregroundColor(.green)
                     }
                     .frame(width: 50,height: 55)
 //                    .disabled(userModel.studentID.count != 8)
@@ -60,6 +61,7 @@ struct LoginView: View {
                         .foregroundColor(.white)
                         .overlay (
                             Text("로그인")
+                                .foregroundColor(.green.opacity(0.8))
                         )
                         .frame(width: screenWidth / 2, height: 50)
                 }.disabled(!submitComplete)

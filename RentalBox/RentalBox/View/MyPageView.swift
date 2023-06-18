@@ -36,6 +36,7 @@ struct MyPageView: View {
                         .foregroundColor(.white)
                         .overlay(
                             Text("로그아웃")
+                                .foregroundColor(.green.opacity(0.8))
                         )
                 }
             }

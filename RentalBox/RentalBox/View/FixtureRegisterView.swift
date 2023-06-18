@@ -17,6 +17,7 @@ let numberFormatter: NumberFormatter = {
 struct FixtureRegisterView: View {
     @EnvironmentObject var userVM: UserVM
     @EnvironmentObject var networking: FixtureViewModel
+    @FocusState var isFocused: Bool
     @State var bookName = ""
     @State var bookCount = 0
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -38,7 +39,8 @@ struct FixtureRegisterView: View {
                 HStack {
                     Text("물품명 :")
                         .padding()
-                    TextField("등록하시려는 물품의 이름을 입력해주세요.", text: $bookName)
+                    TextField("물품의 이름을 입력해주세요.", text: $bookName)
+                        .focused($isFocused)
                         
                 }
                 .frame(height: 50)
@@ -47,10 +49,11 @@ struct FixtureRegisterView: View {
                 HStack {
                     Text("개수 :")
                         .padding()
-                    TextField("개수를 입력해주세요", value: $bookCount, formatter: numberFormatter)
+                    TextField("개수를 입력해주세요.", value: $bookCount, formatter: numberFormatter)
                         .textContentType(.oneTimeCode)
                         .keyboardType(.decimalPad)
                         .offset(x:15)
+                        .focused($isFocused)
                 }
                 .frame(height: 50)
                 .background(in: RoundedRectangle(cornerRadius: 10))
@@ -59,10 +62,11 @@ struct FixtureRegisterView: View {
                     networking.alamofireFixtureUpload(url: url, itemName: bookName, count: bookCount)
                 } label: {
                     RoundedRectangle(cornerRadius: 10)
-                        .frame(width:100, height: 50)
+                        .frame(width:120, height: 50)
                         .foregroundColor(.white)
                         .overlay(
                             Text("등록하기")
+                                .foregroundColor(.green.opacity(0.8))
                         )
                 }
                 .padding()
@@ -71,15 +75,18 @@ struct FixtureRegisterView: View {
                     self.presentationMode.wrappedValue.dismiss()
                 } label: {
                     RoundedRectangle(cornerRadius: 10)
-                        .frame(width:100, height: 50)
+                        .frame(width:120, height: 50)
                         .foregroundColor(.white)
                         .overlay(
                             Text("확인")
+                                .foregroundColor(.green.opacity(0.8))
                         )
                 }
             }
             
 
+        }.onTapGesture {
+            isFocused = false
         }
     }
 }

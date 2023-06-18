@@ -27,13 +27,13 @@ struct HeaderView: View {
                     moveToMy.toggle()
                 } label: {
                     RoundedRectangle(cornerRadius: 10)
-                        .foregroundColor(.green)
+                        .foregroundColor(.green.opacity(0.8))
                         .overlay(
-                        Text("MY").font(.system(size: 30, weight: .bold, design: .rounded))
+                        Text("My page").font(.system(size: 20, weight: .bold, design: .rounded))
                             .foregroundColor(.black)
                     )
                 }
-                .frame(width: screenWidth / 3)
+                .frame(width: 120, height: 40)
                 .sheet(isPresented: $moveToMy) {
                     MyPageView()
                 }

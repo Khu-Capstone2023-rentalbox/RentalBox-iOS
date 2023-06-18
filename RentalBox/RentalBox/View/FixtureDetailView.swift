@@ -58,6 +58,7 @@ struct FixtureDetailView: View {
                             .foregroundColor(.white)
                             .overlay(
                                 Text("대여하기")
+                                    .foregroundColor(.green.opacity(0.8))
                             )
                     }
                     .frame(width: 100, height: 40)

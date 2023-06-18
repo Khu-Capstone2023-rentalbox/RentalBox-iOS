@@ -43,6 +43,7 @@ struct ContentView: View {
                             .foregroundColor(.white)
                             .overlay (
                                 Text("입력완료")
+                                    .foregroundColor(.green.opacity(0.8))
                             )
                             .frame(width: screenWidth / 2, height: 50)
                     }
@@ -55,6 +56,7 @@ struct ContentView: View {
                             .foregroundColor(.white)
                             .overlay (
                                 Text("동아리 생성하기")
+                                    .foregroundColor(.green.opacity(0.8))
                             )
                             .frame(width: screenWidth / 2, height: 50)
                     }

@@ -16,6 +16,9 @@ struct MainView: View {
     @State private var rent = false
     @State var inputText = ""
     @State var fixtures = Fixtures(isSuccess: false, message: "", code: 0, data: [])
+   
+    @FocusState var isFocused: Bool
+    
     @ObservedObject var networking: FixtureViewModel
     @EnvironmentObject var userVM: UserVM
    
@@ -37,6 +40,7 @@ struct MainView: View {
                 HStack {
                     SearchBarView(inputText: $inputText)
                         .environmentObject(networking)
+                        .focused($isFocused)
                 }
                 .padding(.horizontal)
                 MainListView(dummyList: networking.fixtures?.data ?? [Book(bookId: 0, name: "인가탐", created_at: Date.now, updated_at: Date.now)], inputText: $inputText, networking: networking)
@@ -55,6 +59,7 @@ struct MainView: View {
                             .foregroundColor(.white)
                             .overlay(
                                 Text("등록하기")
+                                    .foregroundColor(.green.opacity(0.8))
                             )
                     }
                     .sheet(isPresented: $register) {
@@ -70,6 +75,7 @@ struct MainView: View {
                             .foregroundColor(.white)
                             .overlay(
                                 Text("대여하기")
+                                    .foregroundColor(.green.opacity(0.8))
                             )
                     }
                     .sheet(isPresented: $rent) {
@@ -78,7 +84,9 @@ struct MainView: View {
                 }
                 .padding()
             }
-        }.navigationBarHidden(true)
+        }.navigationBarHidden(true).onTapGesture {
+            isFocused = false
+        }
     }
 }
 

@@ -23,15 +23,15 @@ struct MypageListView: View {
                             .overlay(
                                 HStack {
                                     Text(row.itemName)
-                                        
+                                        .foregroundColor(.black)
                                     Spacer()
                                     Image(systemName: "arrow.forward")
                                         .resizable()
                                         .scaledToFit()
                                         .frame(width: 12)
+                                        .foregroundColor(.green.opacity(0.8))
                                 }
                                     .padding()
-                                    .foregroundColor(.teal)
                             )
                         
                     }

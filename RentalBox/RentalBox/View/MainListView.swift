@@ -43,6 +43,7 @@ struct MainListView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 10)
+                        .foregroundColor(.green.opacity(0.8))
                 }
                 .contentShape(RoundedRectangle(cornerRadius: 10))
                 .onTapGesture {
